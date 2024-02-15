@@ -1,0 +1,54 @@
+==========
+STM32F103CBT  usb-CDC virtual com
+==========
+1. CubeMX / New Project From MCU / STM32F103CBT
+      .SystemCore / SYS / [Debug]SerialWire   PA13(_SWDIO), PA14(_SWCLK)
+                                                           PB4(_NJTRST), PB3(_JTDO), PA15(_JTDI)
+      .SystemCore / SYS / [Timebase]SysTick
+      .SystemCore / RCC / [HSE]CrystalCeramic Resource
+
+o. SystemCore / GPIO 
+      .PA0 > inBD_sw2
+      .PA1 > oTEST_1
+      .PC13 > oBD_LED
+      설정된 Pin 들의 속성을 설정 
+      .SystemCore / GPIO / 상에서 입력단자 내부 풀업등.
+
+o. Timers / TIM2
+      .Clock Source : Internal Clock
+      .Parameter / PreScaler : 7200
+      .Parameter / Auto Reload : 100  is 10ms.
+      .NVIC Interrupt / TIM2 global interrupt : checked
+
+o. Connectivity / USB          PA11(_DM), PA12(_DP)
+      .DEVICE (FS) : checked
+      .Parameter / Speed : Full Speed 12Mbit/s
+      .NVIC  / USB or CAN RX0 interrupt : checked
+
+o. Middleware / USB_DEVICE
+      .Class for FS IP : Comm Device Class (VirtualCom)
+      .Parameter / .
+      .DeviceDescriptor / VID : 1155(STMid)
+      .DeviceDescriptor / PID : 22336(변경가능)
+
+o. Clock Configuaration 설정
+      HSE(8)  /1  /8  *9  PLLCLK(72)  AHB/1  HCLK(72)  APB1/2  APB2/1 = 72Mhz
+        USB PreScaler / 1.5 (48)
+================================
+후 처리
+================================
+nyh_mLoop.c 삽입.
+  //1=USBD_STATE_DEFAULT, 2=USBD_STATE_ADDRESSED, 3=USBD_STATE_CONFIGURED, 4=USBD_STATE_SUSPENDED
+  uint32_t nyh_nUSBdev_state = USBD_STATE_DEFAULT;
+main.c
+   timer2 start :   HAL_TIM_Base_Start_IT(&htim2);
+   main loop에 :  nyh_mLoop();
+stm32f1xx_it.c
+   timer2 : nyh_TIM2_IRQHandler();
+   usb rx:  nyh_HAL_PCD_IRQHandler();
+================================
+
+
+
+
+

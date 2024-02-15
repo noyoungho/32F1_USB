@@ -1,0 +1,4 @@
+nyh_mLoop.c:23:6:nyh_mLoop	8	static
+nyh_mLoop.c:43:6:iTIM2_lifeLED	8	static
+nyh_mLoop.c:56:7:nyh_TIM2_IRQHandler	8	static
+nyh_mLoop.c:64:6:nyh_HAL_PCD_IRQHandler	16	static
